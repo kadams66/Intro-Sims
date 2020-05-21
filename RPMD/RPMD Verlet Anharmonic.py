@@ -70,21 +70,23 @@ class rpmd:
         self.dt = dt
         self.dyn = dynamics(dt, m, switch)
         self._ncalc = 0
+        if switch: self.name = 'Anharmonic'
+        else: self.name = 'Quartic'
 
         #data arrays
         self.Pos = np.zeros(num)
         self.Vel = np.zeros(num)
         self.Frc = np.zeros(num)
-        self.Cxx = np.zeros([round(scyc / freq) + 1, 2])
+        self.Cxx = np.zeros([round(scyc / freq), 2])
         self.forces()
 
     def run(self):
         """Runs the simulation"""
         #loop over 
         for i in range(self.nsamp):
-            print('Simulating trajectory number ', i)
+            print('Trajectory number ', i + 1, ' for the', self.name, ' potential' )
             #resample velocities and initial centroid position
-            self.Vel = np.random.normal(0, np.sqrt(1 / beta / m), self.nsamp)
+            self.Vel = np.random.normal(0, np.sqrt(1 / beta / m), self.num)
             xi = np.mean(self.Pos)
             #MD loop
             for j in range(self.scyc):
@@ -96,7 +98,7 @@ class rpmd:
                 #check if sample step
                 if j % self.freq == 0: self.calc(j, xi)
         #final calculation of correlation function
-        self.Cxx[:,1] = self.Cxx[:] / self._ncalc
+        self.Cxx[:,1] = self.Cxx[:,1] / self._ncalc
             
     
     def forces(self):
@@ -112,11 +114,11 @@ class rpmd:
     
     def velocities(self):
         """updates the velocities for all beads"""
-        self.Vel[:] = self.dyn.vel(self.Vel[:], self.Frc[:])
+        self.Vel = self.dyn.vel(self.Vel, self.Frc)
     
     def positions(self):
         """updates the positions of all beads"""
-        self.Pos[:] = self.dyn.pos(self.Pos[:], self.Vel[:], self.Frc[:])
+        self.Pos = self.dyn.pos(self.Pos, self.Vel, self.Frc)
     
     def calc(self, step, xi):
         """updates the correlation function\n
@@ -124,20 +126,45 @@ class rpmd:
         xi = inital centroid position of ring polymer
         """
         self._ncalc += 1
-        self.Cxx[step / self.freq, 0] = step * self.dt
-        self.Cxx[step / self.freq, 1] += np.mean(self.Pos) * xi
+        self.Cxx[int(step / self.freq), 0] = step * self.dt
+        self.Cxx[int(step / self.freq), 1] += np.mean(self.Pos) * xi
+
+def save_data(data1, data2):
+    """Generates plots and saves correlation functions and plots\n
+    data1 : first object
+    data2 : second object
+    """
+    #saves correlation functions to .dat files
+    np.savetxt('Anharmonic Cxx.dat', data1.Cxx)
+    np.savetxt('Quartic Cxx.dat', data2.Cxx)
+    #generates figure and subplots
+    fig, aa = plt.subplots(2, sharex=True)
+    #plot data
+    aa[0].plot(data1.Cxx[:,0], data1.Cxx[:,1])
+    aa[1].plot(data2.Cxx[:,0], data2.Cxx[:,1])
+    #label figure
+    plt.setp(aa[:], ylabel=r'$C_{xx}(t)$', xlabel='Time')
+    aa[0].set_title('Anharmonic Potential Correlation Function')
+    aa[1].set_title('Quartic Potential Correlation Function')
+    for a in aa: a.label_outer()
+    #save figure
+    fig.savefig('Correlation functions.png')
 
 ######################################################################################
 
 if __name__ == "__main__":
-    nsamp = 20
-    scyc = 600
+    nsamp = 100
+    scyc = 1000
     freq = 5
     m = 1
     dt = 0.05
-    Ti = 1
-    beta = 1 / Ti
-    num = 4 * beta
+    beta = 1
+    num = int(4 * beta)
 
     rpmd1 = rpmd(num, nsamp, scyc, freq, beta, m, dt, True)
     rpmd1.run()
+
+    rpmd2 = rpmd(num, nsamp, scyc, freq, beta, m, dt, False)
+    rpmd2.run()
+
+    save_data(rpmd1, rpmd2)
