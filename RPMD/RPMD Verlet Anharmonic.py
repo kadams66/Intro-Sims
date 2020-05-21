@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+##########################################################
+
 class dynamics:
     """Newton's eqns of motion and Velocity Verlet algorithms\n
     dt : delta time\n
@@ -46,6 +48,8 @@ class dynamics:
         """
         return self.m * vel**2 / 2
 
+########################################################################
+
 class rpmd:
     """Ring polymer molecular dynamics functions\n
     num : number of beads\n
@@ -69,7 +73,6 @@ class rpmd:
         self.m = m
         self.dt = dt
         self.dyn = dynamics(dt, m, switch)
-        self._ncalc = 0
         if switch: self.name = 'Anharmonic'
         else: self.name = 'Quartic'
 
@@ -98,7 +101,7 @@ class rpmd:
                 #check if sample step
                 if j % self.freq == 0: self.calc(j, xi)
         #final calculation of correlation function
-        self.Cxx[:,1] = self.Cxx[:,1] / self._ncalc
+        self.Cxx[:,1] = self.Cxx[:,1] / self.nsamp
             
     
     def forces(self):
@@ -125,7 +128,6 @@ class rpmd:
         step : current step in simulation
         xi = inital centroid position of ring polymer
         """
-        self._ncalc += 1
         self.Cxx[int(step / self.freq), 0] = step * self.dt
         self.Cxx[int(step / self.freq), 1] += np.mean(self.Pos) * xi
 
@@ -148,6 +150,7 @@ def save_data(data1, data2):
     aa[1].set_title('Quartic Potential Correlation Function')
     for a in aa: a.label_outer()
     #save figure
+    plt.tight_layout()
     fig.savefig('Correlation functions.png')
 
 ######################################################################################
