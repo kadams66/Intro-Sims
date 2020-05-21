@@ -133,8 +133,10 @@ class rpmd:
 
 def save_data(data1, data2, data3, data4):
     """Generates plots and saves correlation functions and plots\n
-    data1 : first object
-    data2 : second object
+    data1 : first object vertically\n
+    data2 : second object vertically\n
+    data3 : third object vertically\n
+    data4 : fourth object vertically
     """
     #saves correlation functions to .dat files
     np.savetxt('Anharmonic Cxx.dat', data1.Cxx)
@@ -160,15 +162,15 @@ def save_data(data1, data2, data3, data4):
 ######################################################################################
 
 if __name__ == "__main__":
-    nsamp = 100
-    scyc = 1000
-    freq = 5
+    nsamp = 1000
+    scyc = 3000
+    freq = 10
     m = 1
-    dt = 0.05
+    dt = 0.01
 
     #beta = 1 runs
     beta = 1
-    num = int(4 * beta)
+    num = 4 * beta
     rpmd1 = rpmd(num, nsamp, scyc, freq, beta, m, dt, True)
     rpmd1.run()
     rpmd2 = rpmd(num, nsamp, scyc, freq, beta, m, dt, False)
@@ -176,7 +178,7 @@ if __name__ == "__main__":
 
     #beta = 8 runs
     beta = 8
-    num = int(4 * beta)
+    num = 4 * beta
     rpmd3 = rpmd(num, nsamp, scyc, freq, beta, m, dt, True)
     rpmd3.run()
     rpmd4 = rpmd(num, nsamp, scyc, freq, beta, m, dt, False)
