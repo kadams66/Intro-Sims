@@ -139,8 +139,10 @@ def save_data(data1, data2, data3, data4):
     data4 : fourth object vertically
     """
     #saves correlation functions to .dat files
-    np.savetxt('Anharmonic Cxx.dat', data1.Cxx)
-    np.savetxt('Quartic Cxx.dat', data2.Cxx)
+    np.savetxt('Anharmonic Cxx Beta 1.dat', data1.Cxx)
+    np.savetxt('Anharmonic Cxx Beta 8.dat', data2.Cxx)
+    np.savetxt('Quartic Cxx Beta 1.dat', data3.Cxx)
+    np.savetxt('Quartic Cxx Beta 8.dat', data4.Cxx)
     #generates figure and subplots
     fig, aa = plt.subplots(4, sharex=True, figsize=(6.4 * 1.5,3 * 4.8))
     #plot data
