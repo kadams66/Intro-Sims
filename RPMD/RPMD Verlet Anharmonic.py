@@ -87,7 +87,7 @@ class rpmd:
         """Runs the simulation"""
         #loop over 
         for i in range(self.nsamp):
-            print('Trajectory number ', i + 1, ' for the', self.name, ' potential' )
+            print('Trajectory number', i + 1, 'for the', self.name, 'potential at beta of', self.beta)
             #resample velocities and initial centroid position
             self.Vel = np.random.normal(0, np.sqrt(1 / beta / m), self.num)
             xi = np.mean(self.Pos)
@@ -131,7 +131,7 @@ class rpmd:
         self.Cxx[int(step / self.freq), 0] = step * self.dt
         self.Cxx[int(step / self.freq), 1] += np.mean(self.Pos) * xi
 
-def save_data(data1, data2):
+def save_data(data1, data2, data3, data4):
     """Generates plots and saves correlation functions and plots\n
     data1 : first object
     data2 : second object
@@ -140,14 +140,18 @@ def save_data(data1, data2):
     np.savetxt('Anharmonic Cxx.dat', data1.Cxx)
     np.savetxt('Quartic Cxx.dat', data2.Cxx)
     #generates figure and subplots
-    fig, aa = plt.subplots(2, sharex=True)
+    fig, aa = plt.subplots(4, sharex=True, figsize=(6.4 * 1.5,3 * 4.8))
     #plot data
     aa[0].plot(data1.Cxx[:,0], data1.Cxx[:,1])
     aa[1].plot(data2.Cxx[:,0], data2.Cxx[:,1])
+    aa[2].plot(data3.Cxx[:,0], data3.Cxx[:,1])
+    aa[3].plot(data4.Cxx[:,0], data4.Cxx[:,1])
     #label figure
     plt.setp(aa[:], ylabel=r'$C_{xx}(t)$', xlabel='Time')
-    aa[0].set_title('Anharmonic Potential Correlation Function')
-    aa[1].set_title('Quartic Potential Correlation Function')
+    aa[0].set_title(r'Anharmonic Potential Correlation Function at $\beta = 1$')
+    aa[1].set_title(r'Anharmonic Potential Correlation Function at $\beta = 8$')
+    aa[2].set_title(r'Quartic Potential Correlation Function at $\beta = 1$')
+    aa[3].set_title(r'Quartic Potential Correlation Function at $\beta = 8$')
     for a in aa: a.label_outer()
     #save figure
     plt.tight_layout()
@@ -161,13 +165,21 @@ if __name__ == "__main__":
     freq = 5
     m = 1
     dt = 0.05
+
+    #beta = 1 runs
     beta = 1
     num = int(4 * beta)
-
     rpmd1 = rpmd(num, nsamp, scyc, freq, beta, m, dt, True)
     rpmd1.run()
-
     rpmd2 = rpmd(num, nsamp, scyc, freq, beta, m, dt, False)
     rpmd2.run()
 
-    save_data(rpmd1, rpmd2)
+    #beta = 8 runs
+    beta = 8
+    num = int(4 * beta)
+    rpmd3 = rpmd(num, nsamp, scyc, freq, beta, m, dt, True)
+    rpmd3.run()
+    rpmd4 = rpmd(num, nsamp, scyc, freq, beta, m, dt, False)
+    rpmd4.run()
+
+    save_data(rpmd1, rpmd3, rpmd2, rpmd4)
