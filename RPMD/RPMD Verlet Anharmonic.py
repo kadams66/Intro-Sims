@@ -17,7 +17,7 @@ class dynamics:
         self.switch = switch
 
     def vel(self, currVel, frc):
-        """Returns the new velocity after a half time-step.\n
+        """Returns the new velocity after a half time-step\n
         currVel : current velocity\n
         frc : current force
         """
@@ -125,7 +125,7 @@ class rpmd:
     
     def calc(self, step, xi):
         """updates the correlation function\n
-        step : current step in simulation
+        step : current step in simulation\n
         xi = inital centroid position of ring polymer
         """
         self.Cxx[int(step / self.freq), 0] = step * self.dt
